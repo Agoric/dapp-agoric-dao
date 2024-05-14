@@ -62,21 +62,11 @@ instance-q:
 
 start-contract: start-contract-mint start-contract-swap start-contract-pay
 
-start-contract-mint:
+start-contract-dao:
 	yarn node scripts/deploy-contract.js \
-		--install src/sell-concert-tickets.contract.js \
+		--install src/dao.contract.js \
 		--eval src/platform-goals/board-aux.core.js \
-		--eval src/sell-concert-tickets.proposal.js
-
-start-contract-swap:
-	yarn node scripts/deploy-contract.js \
-		--install src/swaparoo.contract.js \
-		--eval src/swaparoo.proposal.js
-
-start-contract-pay:
-	yarn node scripts/deploy-contract.js \
-		--install src/postal-service.contract.js \
-		--eval src/postal-service.proposal.js
+		--eval src/dao.proposal.js
 
 # bundle-X.json.installed show that bundle-X.json was installed
 # see also e2e-tools.js

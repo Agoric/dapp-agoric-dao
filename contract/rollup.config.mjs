@@ -18,9 +18,8 @@ import {
   emitPermit,
   configureOptions,
 } from './tools/rollup-plugin-core-eval.js';
-import { permit as postalServicePermit } from './src/postal-service.proposal.js';
-import { permit as swapPermit } from './src/swaparoo.proposal.js';
-import { permit as sellPermit } from './src/sell-concert-tickets.proposal.js';
+
+import { permit as daoPermit } from './src/dao.proposal.js';
 import { permit as boardAuxPermit } from './src/platform-goals/board-aux.core.js';
 
 /**
@@ -73,21 +72,8 @@ const config = [
     contractEntry: null,
   }),
   config1({
-    name: 'sell-concert-tickets',
-    permit: sellPermit,
-  }),
-  config1({
-    name: 'swaparoo',
-    permit: swapPermit,
-    coreScriptOptions: {
-      swaparooCommittee: {
-        voterAddresses: env.SWAP_GOV_ADDR ? { v1: env.SWAP_GOV_ADDR } : {},
-      },
-    },
-  }),
-  config1({
-    name: 'postal-service',
-    permit: postalServicePermit,
+    name: 'dao',
+    permit: daoPermit,
   }),
 ];
 export default config;

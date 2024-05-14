@@ -8,31 +8,17 @@ import {
 
 const { Fail } = assert;
 
-const contractName = 'sellConcertTickets';
-const IST_UNIT = 1_000_000n;
+const contractName = 'simpleDao';
 
-export const makeInventory = (brand, baseUnit) => {
+export const makeTerms = (daoTokensBrand, daoTokensUnits, membershipBrand) => {
   return {
-    frontRow: {
-      tradePrice: AmountMath.make(brand, baseUnit * 3n),
-      maxTickets: 3n,
-    },
-    middleRow: {
-      tradePrice: AmountMath.make(brand, baseUnit * 2n),
-      maxTickets: 3n,
-    },
-    lastRow: {
-      tradePrice: AmountMath.make(brand, baseUnit * 1n),
-      maxTickets: 3n,
-    },
+    DaoTerms: {
+      DaoToken: AmountMath.make(daoTokensBrand, daoTokensUnits),
+      Membership: AmountMath.make(membershipBrand, 10n),
+    }
   };
 };
 
-export const makeTerms = (brand, baseUnit) => {
-  return {
-    inventory: makeInventory(brand, baseUnit),
-  };
-};
 
 /**
  * Core eval script to start contract
@@ -41,12 +27,12 @@ export const makeTerms = (brand, baseUnit) => {
  * @param {*} config
  *
  * @typedef {{
- *   brand: PromiseSpaceOf<{ Ticket: Brand }>;
- *   issuer: PromiseSpaceOf<{ Ticket: Issuer }>;
- *   instance: PromiseSpaceOf<{ sellConcertTickets: Instance }>
- * }} SellTicketsSpace
+ *   brand: PromiseSpaceOf<{ DaoToken: Brand }>;
+ *   issuer: PromiseSpaceOf<{ DaoToken: Issuer }>;
+ *   instance: PromiseSpaceOf<{ Dao: Instance }>
+ * }} DaoSpace
  */
-export const startSellConcertTicketsContract = async (
+export const startDaoContract = async (
   permittedPowers,
   config,
 ) => {
@@ -66,36 +52,40 @@ export const startSellConcertTicketsContract = async (
     issuer: permittedPowers.issuer.consume.IST,
   });
 
-  const terms = makeTerms(ist.brand, 1n * IST_UNIT);
+  //basic terms
+  const terms = makeTerms("DummyDao", 100n, "DummyMembership");
 
   await startContract(permittedPowers, {
     name: contractName,
     startArgs: {
       installation,
-      issuerKeywordRecord: { Price: ist.issuer },
       terms,
     },
-    issuerNames: ['Ticket'],
+    issuerNames: ['DummyDao', 'DummyMembership'],
   });
 
   console.log(contractName, '(re)started');
 };
 
+// need more details on permit
 /** @type { import("@agoric/vats/src/core/lib-boot").BootstrapManifestPermit } */
 export const permit = harden({
   consume: {
     agoricNames: true,
     brandAuxPublisher: true,
-    startUpgradable: true, // to start contract and save adminFacet
-    zoe: true, // to get contract terms, including issuer/brand
+    startUpgradable: true, 
+    zoe: true,
+    board: true,
+    chainStorage: true,
   },
   installation: {
     consume: { [contractName]: true },
     produce: { [contractName]: true },
   },
   instance: { produce: { [contractName]: true } },
-  issuer: { consume: { IST: true }, produce: { Ticket: true } },
-  brand: { consume: { IST: true }, produce: { Ticket: true } },
+  // permitting brands
+  issuer: { consume: { IST: true, Membership: true, DaoToken: true }, produce: { Membership: true, DaoToken: true} },
+  brand: { consume: { IST: true, Membership: true, DaoToken: true }, produce: { Membership: true, DaoToken: true} },
 });
 
-export const main = startSellConcertTicketsContract;
+export const main = startDaoContract;
