@@ -1,5 +1,7 @@
 # Simple Voting DAO Contract on Agoric
 
+<img src="./images/sequence-diagram.png" width="100%" />
+
 ## Overview
 
 This simple voting DAO contract is designed to manage decentralized governance through proposals and voting. It utilizes ERTP (Electronic Rights Transfer Protocol) for handling and verifying digital assets within the smart contract.
