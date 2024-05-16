@@ -18,8 +18,6 @@ import { ParamTypes } from '@agoric/governance/src/constants.js';
   
 
 
-const { Fail, quote: q } = assert;
-
 // TODO: use shape 
 const VoteShape = M.recordOf(M.string(), {
  voteAmount: AmountShape,
@@ -32,11 +30,6 @@ export const terms = harden({
         Membership: AmountShape,
 }});
 
-const paramTypes = harden(
-    /** @type {const} */ ({
-    Fee: ParamTypes.AMOUNT,
-}),
-);
 
 export const start = async (zcf , privateArgs, baggage) => {
 
