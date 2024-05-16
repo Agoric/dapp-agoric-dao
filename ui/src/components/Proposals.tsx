@@ -11,15 +11,6 @@ import { makeCopyBag } from '@endo/patterns';
 import { E } from '@endo/far';
 
 
-const { entries } = Object;
-
-interface Proposal {
-    id: string; 
-    title: string;
-    details: string;
-}
-
-
 const joinDao = (
     wallet: AgoricWalletConnection,
   ) => {
