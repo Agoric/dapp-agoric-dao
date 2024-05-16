@@ -62,7 +62,7 @@ instance-q:
 
 start-contract: start-contract-mint start-contract-swap start-contract-pay
 
-start-contract-dao:
+start-contract-mint:
 	yarn node scripts/deploy-contract.js \
 		--install src/dao.contract.js \
 		--eval src/platform-goals/board-aux.core.js \

@@ -6,9 +6,20 @@ import {
   startContract,
 } from './platform-goals/start-contract.js';
 
+import { E } from '@endo/far';
+
 const { Fail } = assert;
 
-const contractName = 'simpleDao';
+const pathSegmentPattern = /^[a-zA-Z0-9_-]{1,100}$/;
+
+/** @type {(name: string) => void} */
+const assertPathSegment = name => {
+  pathSegmentPattern.test(name) ||
+    Fail`Path segment names must consist of 1 to 100 characters limited to ASCII alphanumerics, underscores, and/or dashes: ${name}`;
+};
+harden(assertPathSegment);
+
+const contractName = 'simpleDAO';
 
 export const makeTerms = (daoTokensBrand, daoTokensUnits, membershipBrand) => {
   return {
@@ -23,7 +34,7 @@ export const makeTerms = (daoTokensBrand, daoTokensUnits, membershipBrand) => {
 /**
  * Core eval script to start contract
  *
- * @param {BootstrapPowers } permittedPowers
+ * @param {BootstrapPowers } powers
  * @param {*} config
  *
  * @typedef {{
@@ -33,38 +44,57 @@ export const makeTerms = (daoTokensBrand, daoTokensUnits, membershipBrand) => {
  * }} DaoSpace
  */
 export const startDaoContract = async (
-  permittedPowers,
+  powers,
   config,
 ) => {
   console.log('core eval for', contractName);
+
   const {
     // must be supplied by caller or template-replaced
     bundleID = Fail`no bundleID`,
   } = config?.options?.[contractName] ?? {};
 
-  const installation = await installContract(permittedPowers, {
+  
+  const {
+    consume: { board, chainStorage, startUpgradable },
+    installation: {
+      consume: { [contractName]: committee },
+    },
+    instance: {
+      produce: { [contractName]: produceInstance },
+    },
+  } = powers;
+
+  const installation = await installContract(powers, {
     name: contractName,
     bundleID,
   });
 
-  const ist = await allValues({
-    brand: permittedPowers.brand.consume.IST,
-    issuer: permittedPowers.issuer.consume.IST,
-  });
 
   //basic terms
-  const terms = makeTerms("DummyDao", 100n, "DummyMembership");
+  const terms = makeTerms("DaoToken", 100n, "Membership");
 
-  await startContract(permittedPowers, {
+  const committeesNode = await E(chainStorage).makeChildNode("dao-proposals");
+  const storageNode = await E(committeesNode).makeChildNode("proposal");
+  const marshaller = await E(board).getPublishingMarshaller();
+  
+  
+  const privateArgs = {
+    storageNode,
+    marshaller,
+  };
+
+  const started = await startContract(powers, {
     name: contractName,
     startArgs: {
       installation,
       terms,
     },
-    issuerNames: ['DummyDao', 'DummyMembership'],
-  });
+    issuerNames: ['DaoToken', 'Membership'],
+  }, privateArgs);
 
   console.log(contractName, '(re)started');
+  produceInstance.resolve(started.instance);
 };
 
 // need more details on permit

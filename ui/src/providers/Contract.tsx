@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import {
   type ChainStorageWatcher,
   AgoricChainStoragePathKind as Kind,
@@ -9,13 +9,14 @@ import { useContractStore } from '../store/contract';
 const { fromEntries } = Object;
 
 const watchContract = (watcher: ChainStorageWatcher) => {
+
   watcher.watchLatest<Array<[string, unknown]>>(
     [Kind.Data, 'published.agoricNames.instance'],
     instances => {
       console.log('Got instances', instances);
       useContractStore.setState({
         instance: instances
-          .find(([name]) => name === 'sellConcertTickets')!
+          .find(([name]) => name === 'simpleDAO')!
           .at(1),
       });
     },
@@ -30,6 +31,24 @@ const watchContract = (watcher: ChainStorageWatcher) => {
       });
     },
   );
+
+    watcher.watchLatest<Array<[unknown]>>(
+    [Kind.Data, 'published.dao-proposals.proposal'],
+    proposals => {
+      console.log("proposals")
+      console.log(proposals)
+      if (proposals != undefined) {
+        useContractStore.setState({
+          proposals: proposals,
+        });
+      }else{
+        useContractStore.setState({
+          proposals: [],
+        });
+      }
+    },
+  );
+
 };
 
 export const ContractProvider = ({ children }: PropsWithChildren) => {

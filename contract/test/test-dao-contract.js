@@ -91,8 +91,23 @@ test('Start the DAO contract and test joining', async t => {
   const seat = await E(zoe).offer(joinInvitation, joinOffer, {});
   const payoutMembership = await E(seat).getPayout('NewMembership');
   const payoutDaoTokens = await E(seat).getPayout('DaoTokens');
-  const proposalId = await E(publicFacet).createProposal('New Funding Proposal', 'Allocate funds for marketing.');
-  console.log(`test proposal Id: ${proposalId}`)
+
+  
+  const createProposalInvitation = E(publicFacet).createProposalInvitation('New Funding Proposal', 'Allocate funds for marketing.')
+
+  const createProposalOffer = {
+    give: {
+  
+    },
+    want: {
+    
+    },
+    exit: { onDemand: null }, //
+  };
+
+  const createProposalSeat = await E(zoe).offer(createProposalInvitation, createProposalOffer, {}, {title: "t", details: "d"});
+
+  // console.log(`test proposal Id: ${proposalId}`)
 
   t.truthy(payoutMembership, 'User should receive a Membership NFT upon joining');
   t.truthy(newMembership.brand === payoutMembership.getAllegedBrand())
@@ -135,7 +150,7 @@ test('Start the DAO contract and test joining', async t => {
   const voteSeat = await E(zoe).offer(voteInvitation, voteOffer, {
     CurrentMembership: membershipWithdrawal,
     Votes: daoTokensWithdrawn,
-  }, {proposalId: proposalId, voteFor: true});
+  }, {proposalId: 1n, voteFor: true});
 
   const voteResult = await E(voteSeat).getOfferResult();
 

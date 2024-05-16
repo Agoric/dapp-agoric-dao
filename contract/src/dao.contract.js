@@ -1,11 +1,21 @@
 // @ts-check
 
-import { Far } from '@endo/far';
+import { Far, E } from '@endo/far';
 import { M, getCopyBagEntries, makeCopyBag } from '@endo/patterns';
 import { AssetKind } from '@agoric/ertp/src/amountMath.js';
 import '@agoric/zoe/exported.js';
-import { AmountShape } from '@agoric/ertp';
+import { AmountShape, AmountMath, PaymentShape } from '@agoric/ertp';
 import { atomicRearrange } from '@agoric/zoe/src/contractSupport/atomicTransfer.js';
+import { makeMyAddressNameAdminKit } from '@agoric/vats/src/core/utils';
+import { makeOnewayPriceAuthorityKit } from '@agoric/zoe/src/contractSupport';
+import {
+    defineERecorderKit,
+    prepareRecorderKitMakers,
+    provideAll
+} from '@agoric/zoe/src/contractSupport/index.js';
+import { handleParamGovernance } from '@agoric/governance/src/contractHelper.js';
+import { ParamTypes } from '@agoric/governance/src/constants.js';
+  
 
 
 const { Fail, quote: q } = assert;
@@ -22,7 +32,13 @@ export const terms = harden({
         Membership: AmountShape,
 }});
 
-export const start = async zcf => {
+const paramTypes = harden(
+    /** @type {const} */ ({
+    Fee: ParamTypes.AMOUNT,
+}),
+);
+
+export const start = async (zcf , privateArgs, baggage) => {
 
     //dao proposal abstractions 
     const proposals = new Map(); // track proposals by UIDs
@@ -51,13 +67,6 @@ export const start = async zcf => {
     };
 
     daoTokenMint.mintGains(toMint);
-
-    //create proposal func
-    const createProposal = (title, details) => {
-        const id = nextProposalId++;
-        proposals.set(id, { id, title, details, votesFor: 0n, votesAgainst: 0n });
-        return id;
-    };
 
     //join proposal
     const joinProposalShape = harden({
@@ -92,7 +101,22 @@ export const start = async zcf => {
         },
         exit: M.any(),
     })
+
+    //create DAO proposal... proposal lol
+    const createProposalProposalShape = harden({
+        give: { 
+
+        },
+        want: {
+
+        },
+        exit: M.any(),
+    })
     
+    const { makeRecorderKit } = prepareRecorderKitMakers(
+        baggage,
+        privateArgs.marshaller,
+    );
     
     // initialDaoSeat.exit(); // close the seat after minting? 
 
@@ -119,10 +143,29 @@ export const start = async zcf => {
             },
         };
 
-        daoTokenMint.mintGains(daoTokenToMint, joiningmMemberSeat); //DAO tokens on joining
-        membershipMint.mintGains(membershipToMint, joiningmMemberSeat); //membership card on join int
+        const { give, want } = joiningmMemberSeat.getProposal();
 
-        joiningmMemberSeat.exit(); // close the seat after minting
+        const daoTokenSeat = daoTokenMint.mintGains(daoTokenToMint); //DAO tokens on joining
+        const membershipSeat = membershipMint.mintGains(membershipToMint); //membership card on join int
+
+        const feeAmount = AmountMath.make(daoTokenBrand, 10n); 
+        const membershipAmount = AmountMath.make(membershipBrand, choiceBag);
+
+
+        atomicRearrange(
+            zcf,
+            harden([
+                // send from joiningMember to initialDaoSeat
+                // [joiningmMemberSeat, initialDaoSeat, give ],
+                //send from 
+                [daoTokenSeat, joiningmMemberSeat, { DaoTokens: feeAmount }],
+                [membershipSeat, joiningmMemberSeat, { NewMembership: membershipAmount }]
+                // [daoTokenSeat, joiningmMemberSeat, want],
+                
+            ]),
+        );
+
+        joiningmMemberSeat.exit(true); // close the seat after minting
         return 'Membership NFT granted with DAO tokens.';
     };
 
@@ -182,11 +225,55 @@ export const start = async zcf => {
 
     const makeVoteInvitation = () => zcf.makeInvitation(vote, "Simple Dao Vote", undefined, voteProposalShape);
 
+
+    //create proposal func
+    const createProposal = async (creatorSeat, title, details) => {
+        const id = BigInt(nextProposalId++);
+        proposals.set(id, { id, title, details, votesFor: 0n, votesAgainst: 0n });
+        console.log("Preparing to record proposal...");
+    
+        try {
+            // cnvert Map to Array for storage
+            const proposalsArray = Array.from(proposals.values()).map(proposal => ({
+                id: proposal.id,
+                title: proposal.title,
+                details: proposal.details,
+                votesFor: proposal.votesFor.toString(),
+                votesAgainst: proposal.votesAgainst.toString()
+            }));
+    
+            console.log("Array of proposals prepared:", proposalsArray);
+    
+            // const proposalNode = await E(privateArgs.storageNode).makeChildNode(`proposal`);
+            const recorderKit = makeRecorderKit(
+                privateArgs.storageNode,
+                // proposalNode,
+                /** @type {import('@agoric/zoe/src/contractSupport/recorder.js').TypedMatcher<MetricsNotification>} */ (
+                  M.any()
+                ),
+            )
+    
+            console.log("recorder Kit initialized");
+            await recorderKit.recorder.write(proposalsArray);
+            console.log("Proposals recorded successfully in storage.");
+    
+        } catch (error) {
+            console.error("Failed to record proposals:", error);
+            throw new Error("Failed to save proposals.");
+        }
+    
+        creatorSeat.exit(true);
+        return id;
+    };
+
+    const createProposalInvitation = () => zcf.makeInvitation(createProposal, "Create DAO Proposal", undefined, createProposalProposalShape);
+
     const publicFacet = Far('Dao Public Facet', {
         makeJoinInvitation,
         makeVoteInvitation,
-        createProposal,
+        createProposalInvitation
     });
 
     return { publicFacet };
 }
+

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Mint } from './mint/Mint';
 import { TabWrapper } from './TabWrapper';
-import { Notifications } from './Notifications';
 import { NotificationContext } from '../context/NotificationContext';
+import { Proposals } from './Proposals'
 
 // notification related types
 const dynamicToastChildStatuses = [
@@ -19,7 +19,7 @@ type DynamicToastChild = {
 
 const Tabs = () => {
   // tab state related functions
-  const [activeTab, setActiveTab] = useState('Mint');
+  const [activeTab, setActiveTab] = useState('DAO Proposals');
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
@@ -28,53 +28,21 @@ const Tabs = () => {
   // notification related functions
   const [notifications, setNotifications] = useState<DynamicToastChild[]>([]);
 
-  const addNotification = (newNotification: DynamicToastChild) => {
-    setNotifications([...notifications, newNotification]);
-  };
 
   return (
     <div className="my-4 flex w-full flex-row justify-center">
-      <Notifications
-        notifications={notifications}
-        setNotifications={setNotifications}
-      />
-      <NotificationContext.Provider
-        value={{ addNotification: addNotification }}
-      >
         <div
           role="tablist"
           className="daisyui-tabs daisyui-tabs-lifted daisyui-tabs-lg"
         >
           <TabWrapper
-            tab="Mint"
+            tab="DAO Proposals"
             activeTab={activeTab}
             handleTabClick={handleTabClick}
           >
-            <Mint />
-          </TabWrapper>
-          <TabWrapper
-            tab="Swap"
-            activeTab={activeTab}
-            handleTabClick={handleTabClick}
-          >
-            <div>TBD</div>
-          </TabWrapper>
-          <TabWrapper
-            tab="Pay"
-            activeTab={activeTab}
-            handleTabClick={handleTabClick}
-          >
-            <div>TBD</div>
-          </TabWrapper>
-          <TabWrapper
-            tab="Vote"
-            activeTab={activeTab}
-            handleTabClick={handleTabClick}
-          >
-            <div>TBD</div>
+            <Proposals />
           </TabWrapper>
         </div>
-      </NotificationContext.Provider>
     </div>
   );
 };

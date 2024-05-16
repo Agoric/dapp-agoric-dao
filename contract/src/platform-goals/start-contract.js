@@ -41,7 +41,12 @@ export const installContract = async (
 export const startContract = async (
   powers,
   { name, startArgs, issuerNames },
+  privateArgs
 ) => {
+
+  console.log("POWERS")
+  console.log(powers)
+  console.log(privateArgs)
   const {
     consume: { startUpgradable },
     installation: { consume: consumeInstallation },
@@ -55,6 +60,7 @@ export const startContract = async (
     ...startArgs,
     installation,
     label: name,
+    privateArgs,
   });
   const { instance } = started;
   produceInstance[name].reset();

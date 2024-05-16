@@ -28,7 +28,7 @@ const Navbar = () => {
       {/* dApp title */}
       <div className="flex-1">
         <button className="daisyui-btn daisyui-btn-ghost text-xl">
-          dApp Agoric Basics
+          dApp Agoric Dao
         </button>
       </div>
       {/* network selector */}
