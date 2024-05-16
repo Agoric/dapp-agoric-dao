@@ -7,7 +7,6 @@ import { useAgoric } from '@agoric/react-components';
 import { useContractStore } from '../store/contract';
 
 const { fromEntries } = Object;
-
 const watchContract = (watcher: ChainStorageWatcher) => {
 
   watcher.watchLatest<Array<[string, unknown]>>(
