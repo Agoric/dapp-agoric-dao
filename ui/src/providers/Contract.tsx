@@ -34,9 +34,7 @@ const watchContract = (watcher: ChainStorageWatcher) => {
     watcher.watchLatest<Array<[unknown]>>(
     [Kind.Data, 'published.dao-proposals.proposal'],
     proposals => {
-      console.log("proposals")
-      console.log(proposals)
-      if (proposals != undefined) {
+      if ((proposals != undefined) && (String(proposals) != "")){
         useContractStore.setState({
           proposals: proposals,
         });

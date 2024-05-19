@@ -60,9 +60,9 @@ vote:
 instance-q:
 	agd query vstorage data published.agoricNames.instance -o json
 
-start-contract: start-contract-mint start-contract-swap start-contract-pay
+start-contract: start-contract-dao
 
-start-contract-mint:
+start-contract-dao:
 	yarn node scripts/deploy-contract.js \
 		--install src/dao.contract.js \
 		--eval src/platform-goals/board-aux.core.js \

@@ -131,6 +131,11 @@ const Proposals = () => {
             },
         };
 
+        const voteDetails = {
+            voteFor: voteFor ? 10n : undefined,
+            voteAgainst: !voteFor ? 10n : undefined,
+        };
+        
         walletConnection.makeOffer(
             {
                 source: 'contract',
@@ -140,12 +145,13 @@ const Proposals = () => {
                 voteFor,
             },
             voteOffer,
-            {proposalId: 1n, voteFor: true},
+            {proposalId: proposalId, ...voteDetails},
             (update: any) => {
                 console.log('Vote update:', update);
             }
         );
     };
+    
     
     return (
         <div className="flex justify-center items-start space-x-4 p-4">
@@ -194,7 +200,8 @@ const Proposals = () => {
                 <div className="daisyui-card-body text-center">
                     <h2 className="daisyui-card-title">Proposals</h2>
                     
-                    {proposals?.map((proposal: any) => (
+                    {
+                    proposals?.map((proposal: any) => (
 
                         <div key={proposal.id} className="mb-4 p-2 border-b">
                             <h3>{proposal.title.title}</h3>
@@ -207,7 +214,8 @@ const Proposals = () => {
                             </button>
                         </div>
                         
-                    ))}
+                    ))
+                    }
 
 
                     <h3 className="daisyui-card-title">Create Proposal</h3>

@@ -267,6 +267,7 @@ export const start = async (zcf , privateArgs, baggage) => {
         createProposalInvitation
     });
 
-    return { publicFacet };
+    return harden({ publicFacet });
 }
 
+harden(start)
