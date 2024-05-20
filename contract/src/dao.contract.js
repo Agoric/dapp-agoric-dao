@@ -31,7 +31,7 @@ export const terms = harden({
 export const start = async (zcf, privateArgs, baggage) => {
   //dao proposal abstractions
   const proposals = new Map(); // track proposals by UIDs
-  let nextProposalId = 1n; // naive generate proposal IDs
+  let nextProposalId = 0n; // naive generate proposal IDs
 
   // create a mints
   const daoTokenMint = await zcf.makeZCFMint('DaoToken', AssetKind.NAT);
@@ -223,7 +223,7 @@ export const start = async (zcf, privateArgs, baggage) => {
 
   //create proposal func
   const createProposal = async (creatorSeat, title, details) => {
-    const id = BigInt(nextProposalId++);
+    const id = BigInt((nextProposalId += 1n));
     proposals.set(id, { id, title, details, votesFor: 0n, votesAgainst: 0n });
     console.log('Preparing to record proposal...');
 
