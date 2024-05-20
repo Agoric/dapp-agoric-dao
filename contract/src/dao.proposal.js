@@ -1,12 +1,11 @@
 // @ts-check
+import { E } from '@endo/far';
 import { allValues } from './objectTools.js';
 import {
   AmountMath,
   installContract,
   startContract,
 } from './platform-goals/start-contract.js';
-
-import { E } from '@endo/far';
 
 const { Fail } = assert;
 
@@ -26,10 +25,9 @@ export const makeTerms = (daoTokensBrand, daoTokensUnits, membershipBrand) => {
     DaoTerms: {
       DaoToken: AmountMath.make(daoTokensBrand, daoTokensUnits),
       Membership: AmountMath.make(membershipBrand, 10n),
-    }
+    },
   };
 };
-
 
 /**
  * Core eval script to start contract
@@ -43,10 +41,7 @@ export const makeTerms = (daoTokensBrand, daoTokensUnits, membershipBrand) => {
  *   instance: PromiseSpaceOf<{ Dao: Instance }>
  * }} DaoSpace
  */
-export const startDaoContract = async (
-  powers,
-  config,
-) => {
+export const startDaoContract = async (powers, config) => {
   console.log('core eval for', contractName);
 
   const {
@@ -54,7 +49,6 @@ export const startDaoContract = async (
     bundleID = Fail`no bundleID`,
   } = config?.options?.[contractName] ?? {};
 
-  
   const {
     consume: { board, chainStorage, startUpgradable },
     installation: {
@@ -70,28 +64,30 @@ export const startDaoContract = async (
     bundleID,
   });
 
+  // basic terms
+  const terms = makeTerms('DaoToken', 100n, 'Membership');
 
-  //basic terms
-  const terms = makeTerms("DaoToken", 100n, "Membership");
-
-  const committeesNode = await E(chainStorage).makeChildNode("dao-proposals");
-  const storageNode = await E(committeesNode).makeChildNode("proposal");
+  const committeesNode = await E(chainStorage).makeChildNode('dao-proposals');
+  const storageNode = await E(committeesNode).makeChildNode('proposal');
   const marshaller = await E(board).getPublishingMarshaller();
-  
-  
+
   const privateArgs = {
     storageNode,
     marshaller,
   };
 
-  const started = await startContract(powers, {
-    name: contractName,
-    startArgs: {
-      installation,
-      terms,
+  const started = await startContract(
+    powers,
+    {
+      name: contractName,
+      startArgs: {
+        installation,
+        terms,
+      },
+      issuerNames: ['DaoToken', 'Membership'],
     },
-    issuerNames: ['DaoToken', 'Membership'],
-  }, privateArgs);
+    privateArgs,
+  );
 
   console.log(contractName, '(re)started');
   produceInstance.resolve(started.instance);
@@ -103,7 +99,7 @@ export const permit = harden({
   consume: {
     agoricNames: true,
     brandAuxPublisher: true,
-    startUpgradable: true, 
+    startUpgradable: true,
     zoe: true,
     board: true,
     chainStorage: true,
@@ -114,8 +110,14 @@ export const permit = harden({
   },
   instance: { produce: { [contractName]: true } },
   // permitting brands
-  issuer: { consume: { IST: true, Membership: true, DaoToken: true }, produce: { Membership: true, DaoToken: true} },
-  brand: { consume: { IST: true, Membership: true, DaoToken: true }, produce: { Membership: true, DaoToken: true} },
+  issuer: {
+    consume: { IST: true, Membership: true, DaoToken: true },
+    produce: { Membership: true, DaoToken: true },
+  },
+  brand: {
+    consume: { IST: true, Membership: true, DaoToken: true },
+    produce: { Membership: true, DaoToken: true },
+  },
 });
 
 export const main = startDaoContract;
