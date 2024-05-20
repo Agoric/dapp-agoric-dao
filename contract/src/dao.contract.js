@@ -1,20 +1,12 @@
 // @ts-check
 
-import { Far, E } from '@endo/far';
-import { M, getCopyBagEntries, makeCopyBag } from '@endo/patterns';
+import { Far } from '@endo/far';
+import { M, makeCopyBag } from '@endo/patterns';
 import { AssetKind } from '@agoric/ertp/src/amountMath.js';
 import '@agoric/zoe/exported.js';
-import { AmountShape, AmountMath, PaymentShape } from '@agoric/ertp';
+import { AmountShape, AmountMath } from '@agoric/ertp';
 import { atomicRearrange } from '@agoric/zoe/src/contractSupport/atomicTransfer.js';
-import { makeMyAddressNameAdminKit } from '@agoric/vats/src/core/utils';
-import { makeOnewayPriceAuthorityKit } from '@agoric/zoe/src/contractSupport';
-import {
-  defineERecorderKit,
-  prepareRecorderKitMakers,
-  provideAll,
-} from '@agoric/zoe/src/contractSupport/index.js';
-import { handleParamGovernance } from '@agoric/governance/src/contractHelper.js';
-import { ParamTypes } from '@agoric/governance/src/constants.js';
+import { prepareRecorderKitMakers } from '@agoric/zoe/src/contractSupport/index.js';
 
 // TODO: use shape
 // const VoteShape = M.recordOf(M.string(), {
