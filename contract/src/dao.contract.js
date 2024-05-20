@@ -29,7 +29,7 @@ export const terms = harden({
 });
 
 export const start = async (zcf, privateArgs, baggage) => {
-  //dao proposal abstractions
+  // dao proposal abstractions
   const proposals = new Map(); // track proposals by UIDs
   let nextProposalId = 0n; // naive generate proposal IDs
 
@@ -62,7 +62,7 @@ export const start = async (zcf, privateArgs, baggage) => {
 
   daoTokenMint.mintGains(toMint);
 
-  //join proposal
+  // join proposal
   const joinProposalShape = harden({
     give: {},
     want: {
@@ -78,7 +78,7 @@ export const start = async (zcf, privateArgs, baggage) => {
     exit: M.any(),
   });
 
-  //vote proposal
+  // vote proposal
   const voteProposalShape = harden({
     give: {
       CurrentMembership: {
@@ -96,7 +96,7 @@ export const start = async (zcf, privateArgs, baggage) => {
     exit: M.any(),
   });
 
-  //create DAO proposal... proposal lol
+  // create DAO proposal... proposal lol
   const createProposalProposalShape = harden({
     give: {},
     want: {},
@@ -132,8 +132,8 @@ export const start = async (zcf, privateArgs, baggage) => {
 
     const { give, want } = joiningmMemberSeat.getProposal();
 
-    const daoTokenSeat = daoTokenMint.mintGains(daoTokenToMint); //DAO tokens on joining
-    const membershipSeat = membershipMint.mintGains(membershipToMint); //membership card on join int
+    const daoTokenSeat = daoTokenMint.mintGains(daoTokenToMint); // DAO tokens on joining
+    const membershipSeat = membershipMint.mintGains(membershipToMint); // membership card on join int
 
     const feeAmount = AmountMath.make(daoTokenBrand, 10n);
     const membershipAmount = AmountMath.make(membershipBrand, choiceBag);
@@ -143,7 +143,7 @@ export const start = async (zcf, privateArgs, baggage) => {
       harden([
         // send from joiningMember to initialDaoSeat
         // [joiningmMemberSeat, initialDaoSeat, give ],
-        //send from
+        // send from
         [daoTokenSeat, joiningmMemberSeat, { DaoTokens: feeAmount }],
         [
           membershipSeat,
@@ -221,7 +221,7 @@ export const start = async (zcf, privateArgs, baggage) => {
   const makeVoteInvitation = () =>
     zcf.makeInvitation(vote, 'Simple Dao Vote', undefined, voteProposalShape);
 
-  //create proposal func
+  // create proposal func
   const createProposal = async (creatorSeat, title, details) => {
     const id = BigInt((nextProposalId += 1n));
     proposals.set(id, { id, title, details, votesFor: 0n, votesAgainst: 0n });
