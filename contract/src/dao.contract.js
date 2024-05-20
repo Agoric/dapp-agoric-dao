@@ -227,6 +227,7 @@ export const start = async (zcf, privateArgs, baggage) => {
     proposals.set(id, { id, title, details, votesFor: 0n, votesAgainst: 0n });
     console.log('Preparing to record proposal...');
 
+    await null;
     try {
       // cnvert Map to Array for storage
       const proposalsArray = Array.from(proposals.values()).map(proposal => ({
