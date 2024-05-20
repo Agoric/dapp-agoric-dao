@@ -27,16 +27,14 @@ export const start = async (zcf, privateArgs, baggage) => {
 
   // create a mints
   const daoTokenMint = await zcf.makeZCFMint('DaoToken', AssetKind.NAT);
-  const { brand: daoTokenBrand, issuer: daoTokenIssuer } =
-    daoTokenMint.getIssuerRecord();
+  const { brand: daoTokenBrand } = daoTokenMint.getIssuerRecord();
   console.log(daoTokenMint);
 
   const membershipMint = await zcf.makeZCFMint(
     'Membership',
     AssetKind.COPY_BAG,
   );
-  const { brand: membershipBrand, issuer: membershipIssuer } =
-    membershipMint.getIssuerRecord();
+  const { brand: membershipBrand } = membershipMint.getIssuerRecord();
   console.log(membershipMint);
 
   // mint initial DAO tokens
@@ -121,8 +119,6 @@ export const start = async (zcf, privateArgs, baggage) => {
         value: 10n,
       },
     };
-
-    const { give, want } = joiningmMemberSeat.getProposal();
 
     const daoTokenSeat = daoTokenMint.mintGains(daoTokenToMint); // DAO tokens on joining
     const membershipSeat = membershipMint.mintGains(membershipToMint); // membership card on join int
