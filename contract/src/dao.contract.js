@@ -17,9 +17,9 @@ import { handleParamGovernance } from '@agoric/governance/src/contractHelper.js'
 import { ParamTypes } from '@agoric/governance/src/constants.js';
 
 // TODO: use shape
-const VoteShape = M.recordOf(M.string(), {
-  voteAmount: AmountShape,
-});
+// const VoteShape = M.recordOf(M.string(), {
+//   voteAmount: AmountShape,
+// });
 
 export const terms = harden({
   DaoTerms: {
