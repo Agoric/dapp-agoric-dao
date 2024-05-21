@@ -172,8 +172,9 @@ test('Start the DAO contract and test joining', async t => {
   );
   const votePayoutMembershipAmount =
     await E(membershipIssuer).getAmountOf(votePayoutMembership);
-  t.truthy(
-    votePayoutMembershipAmount.value.payload[0][0] === 'MembershipCard2',
+  t.is(
+    votePayoutMembershipAmount.value.payload[0][0],
+    'MembershipCard2',
     'The brand of the returned Membership NFT should match the expected brand',
   );
 });
