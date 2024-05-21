@@ -3,7 +3,7 @@
 import { Far } from '@endo/far';
 import { M, makeCopyBag } from '@endo/patterns';
 import { AssetKind } from '@agoric/ertp/src/amountMath.js';
-import '@agoric/zoe/exported.js';
+import '@agoric/zoe/exported.js'; // UNTIL #6512
 import { AmountMath } from '@agoric/ertp';
 import { atomicRearrange } from '@agoric/zoe/src/contractSupport/atomicTransfer.js';
 import { prepareRecorderKitMakers } from '@agoric/zoe/src/contractSupport/index.js';
