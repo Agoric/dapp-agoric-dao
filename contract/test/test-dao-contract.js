@@ -45,13 +45,6 @@ test('Install the contract', async t => {
 test('Start the DAO contract and test joining', async t => {
   const { zoe, bundle } = t.context;
   const installation = E(zoe).install(bundle);
-  const daoTokenKit = makeIssuerKit('DummyDaoToken', AssetKind.NAT);
-  const membershipKit = makeIssuerKit('DummyMembership', AssetKind.COPY_BAG);
-
-  const issuers = {
-    TokenIssuer: daoTokenKit.issuer,
-    MembershipIssuer: membershipKit.issuer,
-  };
 
   const terms = {
     DaoTerms: {
