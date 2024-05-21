@@ -1,6 +1,5 @@
 // @ts-check
 import { E } from '@endo/far';
-import { allValues } from './objectTools.js';
 import {
   AmountMath,
   installContract,
