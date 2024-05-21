@@ -28,7 +28,7 @@ export const start = async (zcf, privateArgs, baggage) => {
   const proposals = new Map(); // track proposals by UIDs
   let nextProposalId = 0n; // naive generate proposal IDs
 
-  // create a mints
+  // create mints
   const daoTokenMint = await zcf.makeZCFMint('DaoToken', AssetKind.NAT);
   const { brand: daoTokenBrand } = daoTokenMint.getIssuerRecord();
   console.log(daoTokenMint);
