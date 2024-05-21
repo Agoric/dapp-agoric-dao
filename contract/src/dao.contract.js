@@ -10,6 +10,14 @@ import { prepareRecorderKitMakers } from '@agoric/zoe/src/contractSupport/index.
 
 const { Fail } = assert;
 
+export const meta = harden({
+  privateArgsShape: {
+    marshaller: M.remotable('Marshaller'),
+    storageNode: M.remotable('StorageNode'),
+  },
+});
+export const privateArgsShape = meta.privateArgsShape;
+
 // TODO: use shape
 // const VoteShape = M.recordOf(M.string(), {
 //   voteAmount: AmountShape,
