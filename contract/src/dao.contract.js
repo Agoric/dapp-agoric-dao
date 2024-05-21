@@ -23,8 +23,27 @@ export const privateArgsShape = meta.privateArgsShape;
 //   voteAmount: AmountShape,
 // });
 
+/** @import {Baggage} from '@agoric/vat-data'; */
+
+/**
+ *
+ * @param {ZCF} zcf
+ * @param {{ marshaller: Marshaller, storageNode: StorageNode }} privateArgs
+ * @param {Baggage} baggage
+ *
+ * @typedef {{
+ *   id: NatValue,
+ *   title: string,
+ *   details: unknown,
+ *   votesFor: NatValue,
+ *   votesAgainst: NatValue
+ * }} ProposalDetail
+ *
+ * @typedef {ProposalDetail[]} ExternalStatus
+ */
 export const start = async (zcf, privateArgs, baggage) => {
   // dao proposal abstractions
+  /** @type {Map<NatValue, ProposalDetail>} */
   const proposals = new Map(); // track proposals by UIDs
   let nextProposalId = 0n; // naive generate proposal IDs
 
@@ -218,12 +237,9 @@ export const start = async (zcf, privateArgs, baggage) => {
     await null;
     try {
       // cnvert Map to Array for storage
-      const proposalsArray = Array.from(proposals.values()).map(proposal => ({
-        id: proposal.id,
-        title: proposal.title,
-        details: proposal.details,
-        votesFor: proposal.votesFor.toString(),
-        votesAgainst: proposal.votesAgainst.toString(),
+      /** @type {ExternalStatus} */
+      const proposalsArray = Array.from(proposals.values()).map(p => ({
+        ...p,
       }));
 
       console.log('Array of proposals prepared:', proposalsArray);
@@ -232,7 +248,7 @@ export const start = async (zcf, privateArgs, baggage) => {
       const recorderKit = makeRecorderKit(
         privateArgs.storageNode,
         // proposalNode,
-        /** @type {import('@agoric/zoe/src/contractSupport/recorder.js').TypedMatcher<MetricsNotification>} */ (
+        /** @type {import('@agoric/zoe/src/contractSupport/recorder.js').TypedMatcher<ExternalStatus>} */ (
           M.any()
         ),
       );
