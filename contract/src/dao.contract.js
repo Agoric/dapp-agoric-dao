@@ -8,6 +8,8 @@ import { AmountMath } from '@agoric/ertp';
 import { atomicRearrange } from '@agoric/zoe/src/contractSupport/atomicTransfer.js';
 import { prepareRecorderKitMakers } from '@agoric/zoe/src/contractSupport/index.js';
 
+const { Fail } = assert;
+
 // TODO: use shape
 // const VoteShape = M.recordOf(M.string(), {
 //   voteAmount: AmountShape,
@@ -154,15 +156,12 @@ export const start = async (zcf, privateArgs, baggage) => {
       membershipBrand,
     );
     const daoTokensGiven = voterSeat.getAmountAllocated('Votes', daoTokenBrand);
-    const proposal = proposals.get(proposalId);
+    const proposal =
+      proposals.get(proposalId) || Fail`proposal ${proposalId} not found`;
     const { give, want } = voterSeat.getProposal();
 
     if (!membershipHeld || !daoTokensGiven) {
       throw new Error('Must hold a Membership NFT and DAO tokens to vote.');
-    }
-
-    if (!proposal) {
-      throw new Error('Proposal not found.');
     }
 
     if (voteFor) {
