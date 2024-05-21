@@ -31,13 +31,14 @@ export const makeTerms = (daoTokensBrand, daoTokensUnits, membershipBrand) => {
 /**
  * Core eval script to start contract
  *
- * @param {BootstrapPowers } powers
- * @param {*} config
+ * @param {BootstrapPowers & DaoSpace} powers
+ * @param {{ options: { [contractName]: { bundleID: string }}}} config
  *
  * @typedef {{
  *   brand: PromiseSpaceOf<{ DaoToken: Brand }>;
  *   issuer: PromiseSpaceOf<{ DaoToken: Issuer }>;
- *   instance: PromiseSpaceOf<{ Dao: Instance }>
+ *   instance: PromiseSpaceOf<{ [contractName]: Instance }>
+ *   installation: PromiseSpaceOf<{ [contractName]: Installation }>
  * }} DaoSpace
  */
 export const startDaoContract = async (powers, config) => {
@@ -49,10 +50,7 @@ export const startDaoContract = async (powers, config) => {
   } = config?.options?.[contractName] ?? {};
 
   const {
-    consume: { board, chainStorage, startUpgradable },
-    installation: {
-      consume: { [contractName]: committee },
-    },
+    consume: { board, chainStorage },
     instance: {
       produce: { [contractName]: produceInstance },
     },
