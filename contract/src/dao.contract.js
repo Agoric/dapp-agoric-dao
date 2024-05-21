@@ -4,7 +4,7 @@ import { Far } from '@endo/far';
 import { M, makeCopyBag } from '@endo/patterns';
 import { AssetKind } from '@agoric/ertp/src/amountMath.js';
 import '@agoric/zoe/exported.js';
-import { AmountShape, AmountMath } from '@agoric/ertp';
+import { AmountMath } from '@agoric/ertp';
 import { atomicRearrange } from '@agoric/zoe/src/contractSupport/atomicTransfer.js';
 import { prepareRecorderKitMakers } from '@agoric/zoe/src/contractSupport/index.js';
 
@@ -12,13 +12,6 @@ import { prepareRecorderKitMakers } from '@agoric/zoe/src/contractSupport/index.
 // const VoteShape = M.recordOf(M.string(), {
 //   voteAmount: AmountShape,
 // });
-
-export const terms = harden({
-  DaoTerms: {
-    DaoToken: AmountShape,
-    Membership: AmountShape,
-  },
-});
 
 export const start = async (zcf, privateArgs, baggage) => {
   // dao proposal abstractions
