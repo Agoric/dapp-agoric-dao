@@ -4,11 +4,12 @@
 import { test as anyTest } from './prepare-test-env-ava.js';
 
 import { createRequire } from 'module';
-import { E } from '@endo/far';
+import { E, Far } from '@endo/far';
 import { makeCopyBag } from '@endo/patterns';
 import { makeNodeBundleCache } from '@endo/bundle-source/cache.js';
 import { makeZoeKitForTest } from '@agoric/zoe/tools/setup-zoe.js';
 import { AmountMath, AssetKind, makeIssuerKit } from '@agoric/ertp';
+import { makeMarshal } from '@endo/marshal';
 
 /** @typedef {typeof import('../src/dao.contract.js').start} AssetContractFn */
 
@@ -44,16 +45,22 @@ test('Install the contract', async t => {
 
 test('Start the DAO contract and test joining', async t => {
   const { zoe, bundle } = t.context;
-  const installation = E(zoe).install(bundle);
+  /** @type {Installation<typeof import('../src/dao.contract.js').start>} */
+  const installation = await E(zoe).install(bundle);
 
-  const terms = {
-    DaoTerms: {
-      DaoToken: AmountMath.make(daoTokenKit.brand, 10n),
-      Membership: AmountMath.make(membershipKit.brand, 10n),
+  const mockMarshaller = Far('M', { ...makeMarshal() });
+  const stores = [];
+  const mockStorageNode = Far('XXX', {
+    setValue(k, v) {
+      stores.push([k, v]);
     },
-  };
-
-  const { instance } = await E(zoe).startInstance(installation, issuers, terms);
+  });
+  const { instance } = await E(zoe).startInstance(
+    installation,
+    undefined,
+    undefined,
+    { marshaller: mockMarshaller, storageNode: mockStorageNode },
+  );
 
   /** @type {[string, bigint][]} */
   const choices = [['MembershipCard1', 1n]];
